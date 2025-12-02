@@ -207,3 +207,22 @@ code {
   background: #f9fafb;
   font-size: 0.9rem;
 }
+/* echtes Koordinatensystem mit SVG für b) und d) */
+
+.coord-graph {
+  margin-top: 0.4rem;
+  padding: 0.6rem;
+  border-radius: 0.6rem;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+}
+
+.coord-graph svg {
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 1 / 1;
+  display: block;
+  margin: 0 auto;
+}
+
+
