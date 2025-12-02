@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aufgabe 1 – Wiederholung lineare Funktionen</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <h1>Aufgabe 1 – Wiederholung lineare Funktionen 📘</h1>
+    <p class="subtitle">
+      Bearbeite Schritt für Schritt die Teilaufgaben und lass dir zu jeder Teilaufgabe eine Erklärung anzeigen.
+    </p>
+
+    <a href="../" class="back-link">← Zur Aufgabenübersicht</a>
+
+    <!-- Koordinatensystem mit gezeichneten Geraden -->
+    <div class="card" id="graph-card">
+      <div class="subtask-title">Koordinatensystem mit den Funktionen (1)–(5)</div>
+      <div class="subtask-body">
+        <p>
+          Die Funktionen (1) bis (5) werden hier als Geraden eingezeichnet.
+          Du kannst dieses Koordinatensystem in den Teilaufgaben b), d) usw. mitbenutzen.
+        </p>
+        <div class="graph-grid">
+          <svg id="graph-svg"></svg>
+        </div>
+        <div id="graph-legend" class="graph-legend"></div>
+      </div>
+    </div>
+
+    <!-- Liste der Funktionsgleichungen -->
+    <div id="aufgabe1-funktionsliste" class="card small-card"></div>
+
+    <!-- Teilaufgaben a)–i) -->
+    <div id="aufgabe1-container"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
