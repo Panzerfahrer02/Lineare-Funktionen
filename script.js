@@ -434,6 +434,25 @@ const inter2_x = -6 / 13;           // Schnittpunkt
 const inter2_y = 30 / 13;
 const tri2_area = 75 / 13;          // Dreiecksfläche
 
+function attachSolutionHandlersAufgabe2() {
+  const mapping = {
+    "2a": show2a,
+    "2b": check2b,
+    "2c": check2c,
+    "2d": check2d,
+    "2e": check2e,
+  };
+
+  Object.entries(mapping).forEach(([id, fn]) => {
+    const btn = document.querySelector(`[data-solution-btn="${id}"]`);
+    if (btn && !btn.dataset.bound) {
+      btn.addEventListener("click", fn);
+      btn.dataset.bound = "true"; // verhindert doppeltes Binden
+    }
+  });
+}
+
+
 function buildAufgabe2() {
   const container = document.getElementById("aufgabe2-container");
   if (!container) return;
@@ -529,6 +548,7 @@ function buildAufgabe2() {
       </div>
     </div>
   `;
+    attachSolutionHandlersAufgabe2();
 }
 
 // ================ Lösungs-Buttons (für beide Aufgaben) ================
