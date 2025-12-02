@@ -1,0 +1,209 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: linear-gradient(135deg, #e0f2fe, #f5f5f7);
+  color: #111827;
+}
+
+.app {
+  max-width: 960px;
+  margin: 2.5rem auto;
+  padding: 2rem 2.25rem;
+  background: #ffffff;
+  border-radius: 1.5rem;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+}
+
+h1 {
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  text-align: center;
+  font-size: 2.1rem;
+}
+
+.subtitle {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 1.8rem;
+}
+
+/* Tabs */
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.3rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.3rem;
+}
+
+.tab-button {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #4b5563;
+}
+
+.tab-button.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+}
+
+/* Tab-Inhalt */
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.tab-hint {
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+/* Cards / Teilaufgaben */
+
+.card {
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.small-card {
+  padding: 0.8rem 1rem;
+}
+
+.subtask-title {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.subtask-body p {
+  margin: 0.15rem 0 0.4rem;
+}
+
+.subtask-inputs {
+  margin: 0.35rem 0 0.6rem;
+}
+
+.subtask-inputs input {
+  padding: 0.25rem 0.4rem;
+  border-radius: 0.4rem;
+  border: 1px solid #d1d5db;
+  margin-right: 0.25rem;
+  width: 70px;
+}
+
+.subtask-inputs input.long {
+  width: 200px;
+}
+
+.subtask-inputs label {
+  margin-right: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.subtask-inputs .inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Buttons */
+
+.btn-solution {
+  padding: 0.35rem 0.8rem;
+  border-radius: 0.6rem;
+  border: none;
+  background: #16a34a;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-solution:hover {
+  background: #15803d;
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.35);
+}
+
+/* Feedback & Erklärung */
+
+.feedback {
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+  min-height: 1.1rem;
+}
+
+.feedback.ok {
+  color: #16a34a;
+}
+
+.feedback.error {
+  color: #dc2626;
+}
+
+.explanation {
+  margin-top: 0.4rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.6rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Tabellen */
+
+.value-table {
+  border-collapse: collapse;
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.value-table th,
+.value-table td {
+  border: 1px solid #d1d5db;
+  padding: 0.25rem 0.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.value-table th {
+  background: #f3f4f6;
+}
+
+/* kleine Code-Optik für Formeln */
+
+code {
+  font-family: "Fira Code", ui-monospace, Menlo, Monaco, monospace;
+  font-size: 0.9rem;
+}
+
+/* einfache Koordinatensystem-Box als Platzhalter */
+
+.coord-placeholder {
+  margin-top: 0.4rem;
+  padding: 0.7rem;
+  border-radius: 0.6rem;
+  border: 1px dashed #d1d5db;
+  background: #f9fafb;
+  font-size: 0.9rem;
+}
