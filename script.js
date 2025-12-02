@@ -18,9 +18,10 @@ function parseNumberToken(token) {
   return Number.isFinite(n) ? n : null;
 }
 
-// ================ Lineare Funktionen (1)–(5) für Aufgabe 1 ================
+// ================ Aufgabe 1: zufällige lineare Funktionen (1)–(5) ================
 
 let funktionen = [];
+let aufgabe1Data = {}; // f1..f5, t1, t2
 
 function generateFunktionen() {
   funktionen = [];
@@ -50,7 +51,7 @@ function wertetabelle(f) {
   return xs.map((x) => ({ x, y: f.m * x + f.n }));
 }
 
-// ================ SVG-Koordinatensystem (wird für Aufgabe 1 und 2 benutzt) ================
+// ================ SVG-Koordinatensystem (für beide Aufgaben) ================
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -67,7 +68,7 @@ function renderGraphSet(svgId, funcs) {
 
   svg.setAttribute("viewBox", `${xmin} ${-ymax} ${xmax - xmin} ${ymax - ymin}`);
 
-  // Gitter
+  // Gitterlinien
   for (let x = xmin; x <= xmax; x++) {
     const v = document.createElementNS(SVG_NS, "line");
     v.setAttribute("x1", x);
@@ -108,10 +109,9 @@ function renderGraphSet(svgId, funcs) {
   ay.setAttribute("stroke-width", "0.08");
   svg.appendChild(ay);
 
-  // Farben
+  // Farben für die Funktionsgraphen
   const colors = ["#22c55e", "#2563eb", "#f97316", "#ec4899", "#8b5cf6"];
 
-  // Geraden
   funcs.forEach((f, idx) => {
     const col = colors[idx % colors.length];
     const x1 = xmin;
@@ -121,7 +121,7 @@ function renderGraphSet(svgId, funcs) {
 
     const line = document.createElementNS(SVG_NS, "line");
     line.setAttribute("x1", x1);
-    line.setAttribute("y1", -y1);
+    line.setAttribute("y1", -y1); // y nach oben → Vorzeichen drehen
     line.setAttribute("x2", x2);
     line.setAttribute("y2", -y2);
     line.setAttribute("stroke", col);
@@ -132,15 +132,13 @@ function renderGraphSet(svgId, funcs) {
 
 // ================ Aufgabe 1 – Rendering ================
 
+let taskGPoint = null; // für 1g
+let taskHP = null;     // für 1h
+let taskHQ = null;     // für 1h
+
 function buildAufgabe1() {
   const listDiv = document.getElementById("aufgabe1-funktionsliste");
   const container = document.getElementById("aufgabe1-container");
-
-  let listHtml = "<strong>Funktionen:</strong><br/>";
-  funktionen.forEach((f) => {
-    listHtml += `(${f.id}) <code>${funktionsText(f)}</code><br/>`;
-  });
-  listDiv.innerHTML = listHtml;
 
   const f1 = funktionen[0];
   const f2 = funktionen[1];
@@ -150,6 +148,14 @@ function buildAufgabe1() {
 
   const t1 = wertetabelle(f1);
   const t2 = wertetabelle(f2);
+
+  aufgabe1Data = { f1, f2, f3, f4, f5, t1, t2 };
+
+  let listHtml = "<strong>Funktionen:</strong><br/>";
+  funktionen.forEach((f) => {
+    listHtml += `(${f.id}) <code>${funktionsText(f)}</code><br/>`;
+  });
+  listDiv.innerHTML = listHtml;
 
   container.innerHTML = `
     <!-- a1 -->
@@ -310,9 +316,7 @@ function buildAufgabe1() {
     <div class="card" id="task-f">
       <div class="subtask-title">f) Gemeinsame Eigenschaft von (1) und (4)</div>
       <div class="subtask-body">
-        <p>
-          Überlege: Welche gemeinsame Eigenschaft haben die Funktionen (1) und (4)?
-        </p>
+        <p>Überlege: Welche gemeinsame Eigenschaft haben die Funktionen (1) und (4)?</p>
         <div class="subtask-inputs">
           <input type="text" class="long" data-task="f" data-role="text" placeholder="Deine Vermutung (wird nicht automatisch bewertet)">
         </div>
@@ -384,14 +388,9 @@ function buildAufgabe1() {
     </div>
   `;
 
+  // Zusatzdaten für 1g/1h
   prepareTaskGandH(f4, f5);
-  attachSolutionHandlers(f1, f2, f3, f4, f5, t1, t2);
 }
-
-// Hilfsdaten für 1g/1h
-let taskGPoint = null;
-let taskHP = null;
-let taskHQ = null;
 
 function prepareTaskGandH(f4, f5) {
   const xS = randomInt(-3, 3);
@@ -421,37 +420,247 @@ function prepareTaskGandH(f4, f5) {
   if (qhY) qhY.textContent = String(yQ);
 }
 
-// ================ Aufgabe 2 – festes Beispiel aus dem Arbeitsblatt ================
+// ----- Teilaufgaben Aufgabe 1 -----
+
+function setFeedback(id, msg, ok) {
+  const fb = document.getElementById(`fb-${id}`);
+  if (!fb) return;
+  fb.textContent = msg;
+  fb.classList.remove("ok", "error");
+  if (msg) fb.classList.add(ok ? "ok" : "error");
+}
+
+function showExplanation(id, html) {
+  const div = document.getElementById(`exp-${id}`);
+  if (!div) return;
+  div.innerHTML = html;
+  div.style.display = "block";
+}
+
+function checkA(taskId, f, table) {
+  const inputsY = document.querySelectorAll(
+    `input[data-task="${taskId}"][data-role="y"]`
+  );
+  const mInput = document.querySelector(
+    `input[data-task="${taskId}"][data-role="m"]`
+  );
+  const nInput = document.querySelector(
+    `input[data-task="${taskId}"][data-role="n"]`
+  );
+
+  let allYCorrect = true;
+  inputsY.forEach((inp, idx) => {
+    const val = parseNumberToken(inp.value || "");
+    const correct = table[idx].y;
+    if (val === null || Math.abs(val - correct) > 1e-6) {
+      allYCorrect = false;
+    }
+  });
+
+  const mVal = parseNumberToken(mInput.value || "");
+  const nVal = parseNumberToken(nInput.value || "");
+  const mOk = mVal !== null && Math.abs(mVal - f.m) < 1e-6;
+  const nOk = nVal !== null && Math.abs(nVal - f.n) < 1e-6;
+
+  const ok = allYCorrect && mOk && nOk;
+
+  const msgParts = [];
+  msgParts.push(
+    allYCorrect ? "Wertetabelle stimmt." : "In der Wertetabelle sind noch Fehler."
+  );
+  msgParts.push(mOk ? "m ist korrekt." : "m ist noch nicht korrekt.");
+  msgParts.push(nOk ? "n ist korrekt." : "n ist noch nicht korrekt.");
+
+  setFeedback(taskId, (ok ? "✅ " : "❌ ") + msgParts.join(" "), ok);
+
+  const rows = table
+    .map(
+      (p) =>
+        `x = ${p.x}  →  y = ${f.m}·(${p.x}) ${
+          f.n >= 0 ? "+ " + f.n : "- " + Math.abs(f.n)
+        } = ${p.y}`
+    )
+    .join("<br>");
+  const exp = `
+    <strong>So kommst du auf die Werte:</strong><br>
+    Für die Funktion <code>${funktionsText(f)}</code> setzt du nacheinander die x-Werte ein:<br>
+    ${rows}<br><br>
+    <strong>Steigung m:</strong> Zahl vor dem x ⇒ m = <code>${f.m}</code>.<br>
+    <strong>y-Achsenabschnitt n:</strong> Wert bei x = 0 ⇒ n = <code>${f.n}</code>.
+  `;
+  showExplanation(taskId, exp);
+}
+
+function explainB(f1, f2) {
+  renderGraphSet("graph-b", [f1, f2]);
+
+  const exp = `
+    Im Koordinatensystem siehst du die Graphen von Funktion (1) und (2).<br><br>
+    <strong>Funktion (1):</strong> <code>${funktionsText(f1)}</code><br>
+    • Steigung m = ${f1.m}, y-Achsenabschnitt n = ${f1.n}.<br><br>
+    <strong>Funktion (2):</strong> <code>${funktionsText(f2)}</code><br>
+    • Steigung m = ${f2.m}, y-Achsenabschnitt n = ${f2.n}.<br>
+    Genau so konstruierst du die Geraden mithilfe von m und n.
+  `;
+  setFeedback("b", "", true);
+  showExplanation("b", exp);
+}
+
+function checkC(f2) {
+  const x0Input = document.querySelector('input[data-task="c"][data-role="x0"]');
+  const y0Input = document.querySelector('input[data-task="c"][data-role="y0"]');
+
+  const x0Val = parseNumberToken(x0Input.value || "");
+  const y0Val = parseNumberToken(y0Input.value || "");
+
+  const x0Correct = -f2.n / f2.m;
+  const y0Correct = f2.n;
+
+  const okX = x0Val !== null && Math.abs(x0Val - x0Correct) < 1e-6;
+  const okY = y0Val !== null && Math.abs(y0Val - y0Correct) < 1e-6;
+  const ok = okX && okY;
+
+  const msg = ok
+    ? "✅ Beide Schnittpunkte sind korrekt."
+    : "❌ Mindestens ein Schnittpunkt ist noch falsch.";
+  setFeedback("c", msg, ok);
+
+  const exp = `
+    Funktion (2): <code>${funktionsText(f2)}</code><br><br>
+    <strong>x-Achse:</strong> y = 0 setzen und nach x lösen.<br>
+    <strong>y-Achse:</strong> x = 0 einsetzen und y berechnen.
+  `;
+  showExplanation("c", exp);
+}
+
+function explainD(f3, f4, f5) {
+  renderGraphSet("graph-d", [f3, f4, f5]);
+  const exp = `
+    Die Funktionen (3), (4) und (5) sind ebenfalls Geraden.<br>
+    Jede ist vollständig durch Steigung m und y-Achsenabschnitt n bestimmt.<br>
+    Im Koordinatensystem siehst du alle drei zusammen.
+  `;
+  setFeedback("d", "", true);
+  showExplanation("d", exp);
+}
+
+function checkE(f4, f5) {
+  const x4Input = document.querySelector('input[data-task="e"][data-role="x4"]');
+  const x5Input = document.querySelector('input[data-task="e"][data-role="x5"]');
+
+  const x4Val = parseNumberToken(x4Input.value || "");
+  const x5Val = parseNumberToken(x5Input.value || "");
+
+  const x4Corr = -f4.n / f4.m;
+  const x5Corr = -f5.n / f5.m;
+
+  const ok4 = x4Val !== null && Math.abs(x4Val - x4Corr) < 1e-6;
+  const ok5 = x5Val !== null && Math.abs(x5Val - x5Corr) < 1e-6;
+  const ok = ok4 && ok5;
+
+  let msg;
+  if (ok4 && ok5) msg = "✅ Beide Nullstellen sind korrekt.";
+  else if (ok4 || ok5) msg = "⚠️ Eine Nullstelle stimmt, die andere nicht.";
+  else msg = "❌ Beide Nullstellen sind (noch) nicht korrekt.";
+  setFeedback("e", msg, ok);
+
+  const exp = `
+    Allgemein: Nullstelle bei y = 0:<br>
+    0 = mx + n ⇒ mx = -n ⇒ x = -n/m.
+  `;
+  showExplanation("e", exp);
+}
+
+function explainF(f1, f4) {
+  let eigenschaft;
+  if (f1.m > 0 && f4.m > 0)
+    eigenschaft = "Beide sind streng monoton steigend (m > 0).";
+  else if (f1.m < 0 && f4.m < 0)
+    eigenschaft = "Beide sind streng monoton fallend (m < 0).";
+  else eigenschaft = "Beide sind Geraden mit genau einer Nullstelle.";
+
+  const exp = `
+    Mögliche gemeinsame Eigenschaften von (1) und (4):<br>
+    • beides lineare Funktionen (Geraden)<br>
+    • konstante Steigung<br>
+    • genau eine Nullstelle<br><br>
+    In deinem konkreten Fall: <strong>${eigenschaft}</strong>
+  `;
+  setFeedback("f", "ℹ️ Freitext, wird nicht automatisch bewertet.", true);
+  showExplanation("f", exp);
+}
+
+function checkG(f4) {
+  const ansInput = document.querySelector('input[data-task="g"][data-role="answer"]');
+  const ansRaw = (ansInput.value || "").trim().toLowerCase();
+  const saysYes = ansRaw === "ja" || ansRaw === "j" || ansRaw === "yes";
+
+  const fVal = f4.m * taskGPoint.x + f4.n;
+  const reallyOnGraph = Math.abs(fVal - taskGPoint.y) < 1e-6;
+
+  const ok =
+    (saysYes && reallyOnGraph) || (!saysYes && !reallyOnGraph);
+  const fb = ok
+    ? "✅ Deine Einschätzung passt."
+    : "❌ Deine Einschätzung stimmt nicht mit der Rechnung überein.";
+  setFeedback("g", fb, ok);
+
+  const exp = `
+    Um zu prüfen, ob ein Punkt auf einem Graphen liegt, setzt du seinen x-Wert in
+    die Funktionsgleichung ein und vergleichst den berechneten y-Wert mit dem Punkt.
+  `;
+  showExplanation("g", exp);
+}
+
+function checkH(f5) {
+  const pyInput = document.querySelector('input[data-task="h"][data-role="py"]');
+  const qxInput = document.querySelector('input[data-task="h"][data-role="qx"]');
+
+  const pyVal = parseNumberToken(pyInput.value || "");
+  const qxVal = parseNumberToken(qxInput.value || "");
+
+  const okPy = pyVal !== null && Math.abs(pyVal - taskHP.y) < 1e-6;
+  const okQx = qxVal !== null && Math.abs(qxVal - taskHQ.x) < 1e-6;
+  const ok = okPy && okQx;
+
+  let msg;
+  if (okPy && okQx) msg = "✅ Beide Koordinaten sind korrekt.";
+  else if (okPy || okQx) msg = "⚠️ Eine Koordinate stimmt, die andere nicht.";
+  else msg = "❌ Beide Koordinaten sind noch nicht korrekt.";
+  setFeedback("h", msg, ok);
+
+  const exp = `
+    Nutze die Funktionsgleichung y = mx + n:<br>
+    • Für P ist x gegeben → y berechnen.<br>
+    • Für Q ist y gegeben → Gleichung nach x umstellen.
+  `;
+  showExplanation("h", exp);
+}
+
+function explainI(f1) {
+  const steig = f1.m > 0 ? "streng monoton steigend" : "streng monoton fallend";
+  const exp = `
+    Funktion (1): <code>${funktionsText(f1)}</code><br><br>
+    <strong>Monotonie:</strong> m = ${f1.m} ⇒ Funktion ist ${steig}.<br><br>
+    <strong>Symmetrie:</strong> allgemeine Geraden mit n ≠ 0 sind weder achsensymmetrisch
+    zur y-Achse noch punktsymmetrisch zum Ursprung.
+  `;
+  setFeedback("i", "ℹ️ Freitext, wird nicht automatisch bewertet.", true);
+  showExplanation("i", exp);
+}
+
+// ================ Aufgabe 2 – feste Funktionen vom Arbeitsblatt ================
 
 // f(x) = (3/2)x + 3
 const f2_f = { m: 3 / 2, n: 3 };
-// g(x) = (-2/3)x + 2 (durch (0|2) und x0 = 3)
+// g(x) = (-2/3)x + 2 (durch (0|2), Nullstelle 3)
 const g2_f = { m: -2 / 3, n: 2 };
 
-const f2_zero = -2;                 // Nullstelle f
-const g2_zero = 3;                  // Nullstelle g
-const inter2_x = -6 / 13;           // Schnittpunkt
+const f2_zero = -2;
+const g2_zero = 3;
+const inter2_x = -6 / 13;
 const inter2_y = 30 / 13;
-const tri2_area = 75 / 13;          // Dreiecksfläche
-
-function attachSolutionHandlersAufgabe2() {
-  const mapping = {
-    "2a": show2a,
-    "2b": check2b,
-    "2c": check2c,
-    "2d": check2d,
-    "2e": check2e,
-  };
-
-  Object.entries(mapping).forEach(([id, fn]) => {
-    const btn = document.querySelector(`[data-solution-btn="${id}"]`);
-    if (btn && !btn.dataset.bound) {
-      btn.addEventListener("click", fn);
-      btn.dataset.bound = "true"; // verhindert doppeltes Binden
-    }
-  });
-}
-
+const tri2_area = 75 / 13;
 
 function buildAufgabe2() {
   const container = document.getElementById("aufgabe2-container");
@@ -548,306 +757,9 @@ function buildAufgabe2() {
       </div>
     </div>
   `;
-    attachSolutionHandlersAufgabe2();
 }
 
-// ================ Lösungs-Buttons (für beide Aufgaben) ================
-
-function attachSolutionHandlers(f1, f2, f3, f4, f5, t1, t2) {
-  const buttons = document.querySelectorAll("[data-solution-btn]");
-  buttons.forEach((btn) => {
-    const id = btn.getAttribute("data-solution-btn");
-    btn.addEventListener("click", () =>
-      handleSolutionClick(id, f1, f2, f3, f4, f5, t1, t2)
-    );
-  });
-}
-
-function setFeedback(id, msg, ok) {
-  const fb = document.getElementById(`fb-${id}`);
-  if (!fb) return;
-  fb.textContent = msg;
-  fb.classList.remove("ok", "error");
-  if (msg) fb.classList.add(ok ? "ok" : "error");
-}
-
-function showExplanation(id, html) {
-  const div = document.getElementById(`exp-${id}`);
-  if (!div) return;
-  div.innerHTML = html;
-  div.style.display = "block";
-}
-
-function handleSolutionClick(id, f1, f2, f3, f4, f5, t1, t2) {
-  switch (id) {
-    // Aufgabe 1
-    case "a1":
-      checkA("a1", f1, t1);
-      break;
-    case "a2":
-      checkA("a2", f2, t2);
-      break;
-    case "b":
-      explainB(f1, f2);
-      break;
-    case "c":
-      checkC(f2);
-      break;
-    case "d":
-      explainD(f3, f4, f5);
-      break;
-    case "e":
-      checkE(f4, f5);
-      break;
-    case "f":
-      explainF(f1, f4);
-      break;
-    case "g":
-      checkG(f4);
-      break;
-    case "h":
-      checkH(f5);
-      break;
-    case "i":
-      explainI(f1);
-      break;
-
-    // Aufgabe 2
-    case "2a":
-      show2a();
-      break;
-    case "2b":
-      check2b();
-      break;
-    case "2c":
-      check2c();
-      break;
-    case "2d":
-      check2d();
-      break;
-    case "2e":
-      check2e();
-      break;
-  }
-}
-
-// ================ Aufgabe 1 – Logik ================
-
-function checkA(taskId, f, table) {
-  const inputsY = document.querySelectorAll(
-    `input[data-task="${taskId}"][data-role="y"]`
-  );
-  const mInput = document.querySelector(
-    `input[data-task="${taskId}"][data-role="m"]`
-  );
-  const nInput = document.querySelector(
-    `input[data-task="${taskId}"][data-role="n"]`
-  );
-
-  let allYCorrect = true;
-  inputsY.forEach((inp, idx) => {
-    const val = parseNumberToken(inp.value || "");
-    const correct = table[idx].y;
-    if (val === null || Math.abs(val - correct) > 1e-6) {
-      allYCorrect = false;
-    }
-  });
-
-  const mVal = parseNumberToken(mInput.value || "");
-  const nVal = parseNumberToken(nInput.value || "");
-  const mOk = mVal !== null && Math.abs(mVal - f.m) < 1e-6;
-  const nOk = nVal !== null && Math.abs(nVal - f.n) < 1e-6;
-
-  const ok = allYCorrect && mOk && nOk;
-
-  const msgParts = [];
-  msgParts.push(
-    allYCorrect ? "Wertetabelle stimmt." : "In der Wertetabelle sind noch Fehler."
-  );
-  msgParts.push(mOk ? "m ist korrekt." : "m ist noch nicht korrekt.");
-  msgParts.push(nOk ? "n ist korrekt." : "n ist noch nicht korrekt.");
-
-  setFeedback(taskId, (ok ? "✅ " : "❌ ") + msgParts.join(" "), ok);
-
-  const rows = table
-    .map(
-      (p) =>
-        `x = ${p.x}  →  y = ${f.m}·(${p.x}) ${
-          f.n >= 0 ? "+ " + f.n : "- " + Math.abs(f.n)
-        } = ${p.y}`
-    )
-    .join("<br>");
-  const exp = `
-    <strong>So kommst du auf die Werte:</strong><br>
-    Für die Funktion <code>${funktionsText(f)}</code> setzt du nacheinander die x-Werte ein:<br>
-    ${rows}<br><br>
-    <strong>Steigung m:</strong> Zahl vor dem x ⇒ m = <code>${f.m}</code>.<br>
-    <strong>y-Achsenabschnitt n:</strong> Wert bei x = 0 ⇒ n = <code>${f.n}</code>.
-  `;
-  showExplanation(taskId, exp);
-}
-
-function explainB(f1, f2) {
-  renderGraphSet("graph-b", [f1, f2]);
-
-  const exp = `
-    Im Koordinatensystem siehst du die Graphen von Funktion (1) und (2).<br><br>
-    <strong>Funktion (1):</strong> <code>${funktionsText(f1)}</code><br>
-    • Steigung m = ${f1.m}.<br>
-    • y-Achsenabschnitt n = ${f1.n}.<br><br>
-    <strong>Funktion (2):</strong> <code>${funktionsText(f2)}</code><br>
-    • Steigung m = ${f2.m}.<br>
-    • y-Achsenabschnitt n = ${f2.n}.<br>
-    Die Geraden sind genau so gezeichnet, wie du sie mit Steigung und Achsenabschnitt konstruierst.
-  `;
-  setFeedback("b", "", true);
-  showExplanation("b", exp);
-}
-
-function checkC(f2) {
-  const x0Input = document.querySelector('input[data-task="c"][data-role="x0"]');
-  const y0Input = document.querySelector('input[data-task="c"][data-role="y0"]');
-
-  const x0Val = parseNumberToken(x0Input.value || "");
-  const y0Val = parseNumberToken(y0Input.value || "");
-
-  const x0Correct = -f2.n / f2.m;
-  const y0Correct = f2.n;
-
-  const okX = x0Val !== null && Math.abs(x0Val - x0Correct) < 1e-6;
-  const okY = y0Val !== null && Math.abs(y0Val - y0Correct) < 1e-6;
-  const ok = okX && okY;
-
-  const msg = ok
-    ? "✅ Beide Schnittpunkte sind korrekt."
-    : "❌ Mindestens ein Schnittpunkt ist noch falsch.";
-  setFeedback("c", msg, ok);
-
-  const exp = `
-    Funktion (2): <code>${funktionsText(f2)}</code><br><br>
-    <strong>x-Achse:</strong> y = 0 einsetzen und nach x lösen.<br>
-    <strong>y-Achse:</strong> x = 0 einsetzen und y berechnen.
-  `;
-  showExplanation("c", exp);
-}
-
-function explainD(f3, f4, f5) {
-  renderGraphSet("graph-d", [f3, f4, f5]);
-
-  const exp = `
-    Die Funktionen (3), (4) und (5) sind ebenfalls Geraden.<br>
-    Jede ist durch Steigung m und y-Achsenabschnitt n eindeutig festgelegt.<br>
-    Im Koordinatensystem siehst du alle drei zusammen.
-  `;
-  setFeedback("d", "", true);
-  showExplanation("d", exp);
-}
-
-function checkE(f4, f5) {
-  const x4Input = document.querySelector('input[data-task="e"][data-role="x4"]');
-  const x5Input = document.querySelector('input[data-task="e"][data-role="x5"]');
-
-  const x4Val = parseNumberToken(x4Input.value || "");
-  const x5Val = parseNumberToken(x5Input.value || "");
-
-  const x4Corr = -f4.n / f4.m;
-  const x5Corr = -f5.n / f5.m;
-
-  const ok4 = x4Val !== null && Math.abs(x4Val - x4Corr) < 1e-6;
-  const ok5 = x5Val !== null && Math.abs(x5Val - x5Corr) < 1e-6;
-  const ok = ok4 && ok5;
-
-  let msg;
-  if (ok4 && ok5) msg = "✅ Beide Nullstellen sind korrekt.";
-  else if (ok4 || ok5) msg = "⚠️ Eine Nullstelle stimmt, die andere nicht.";
-  else msg = "❌ Beide Nullstellen sind (noch) nicht korrekt.";
-  setFeedback("e", msg, ok);
-
-  const exp = `
-    Nullstelle: y = 0 setzen und <code>0 = mx + n</code> nach x lösen: x = -n/m.
-  `;
-  showExplanation("e", exp);
-}
-
-function explainF(f1, f4) {
-  let eigenschaft;
-  if (f1.m > 0 && f4.m > 0)
-    eigenschaft = "Beide sind streng monoton steigend (m > 0).";
-  else if (f1.m < 0 && f4.m < 0)
-    eigenschaft = "Beide sind streng monoton fallend (m < 0).";
-  else eigenschaft = "Beide sind Geraden mit genau einer Nullstelle.";
-
-  const exp = `
-    Mögliche gemeinsame Eigenschaften von (1) und (4):<br>
-    • Beides sind lineare Funktionen (Geraden).<br>
-    • Jede hat eine konstante Steigung.<br>
-    • Jede schneidet die x-Achse genau einmal.<br><br>
-    In deinem konkreten Fall: <strong>${eigenschaft}</strong>
-  `;
-  setFeedback("f", "ℹ️ Freitext, wird nicht automatisch bewertet.", true);
-  showExplanation("f", exp);
-}
-
-function checkG(f4) {
-  const ansInput = document.querySelector('input[data-task="g"][data-role="answer"]');
-  const ansRaw = (ansInput.value || "").trim().toLowerCase();
-  const saysYes = ansRaw === "ja" || ansRaw === "j" || ansRaw === "yes";
-
-  const fVal = f4.m * taskGPoint.x + f4.n;
-  const reallyOnGraph = Math.abs(fVal - taskGPoint.y) < 1e-6;
-
-  const ok =
-    (saysYes && reallyOnGraph) || (!saysYes && !reallyOnGraph);
-  const fb = ok
-    ? "✅ Deine Einschätzung passt."
-    : "❌ Deine Einschätzung stimmt nicht mit der Rechnung überein.";
-  setFeedback("g", fb, ok);
-
-  const exp = `
-    Prüfe, ob S auf dem Graphen liegt, indem du x in die Funktionsgleichung einsetzt
-    und schaust, ob der y-Wert übereinstimmt.
-  `;
-  showExplanation("g", exp);
-}
-
-function checkH(f5) {
-  const pyInput = document.querySelector('input[data-task="h"][data-role="py"]');
-  const qxInput = document.querySelector('input[data-task="h"][data-role="qx"]');
-
-  const pyVal = parseNumberToken(pyInput.value || "");
-  const qxVal = parseNumberToken(qxInput.value || "");
-
-  const okPy = pyVal !== null && Math.abs(pyVal - taskHP.y) < 1e-6;
-  const okQx = qxVal !== null && Math.abs(qxVal - taskHQ.x) < 1e-6;
-  const ok = okPy && okQx;
-
-  let msg;
-  if (okPy && okQx) msg = "✅ Beide Koordinaten sind korrekt.";
-  else if (okPy || okQx) msg = "⚠️ Eine Koordinate stimmt, die andere nicht.";
-  else msg = "❌ Beide Koordinaten sind noch nicht korrekt.";
-  setFeedback("h", msg, ok);
-
-  const exp = `
-    Nutze wieder die Funktionsgleichung von (5): y = mx + n.<br>
-    • Für P ist x gegeben → y ausrechnen.<br>
-    • Für Q ist y gegeben → Gleichung nach x umstellen.
-  `;
-  showExplanation("h", exp);
-}
-
-function explainI(f1) {
-  const steig = f1.m > 0 ? "streng monoton steigend" : "streng monoton fallend";
-  const exp = `
-    Funktion (1): <code>${funktionsText(f1)}</code><br><br>
-    <strong>Monotonie:</strong> m = ${f1.m} ⇒ Funktion ist ${steig}.<br><br>
-    <strong>Symmetrie:</strong> Allgemeine Geraden mit n ≠ 0 sind weder achsensymmetrisch zur y-Achse noch
-    punktsymmetrisch zum Ursprung.
-  `;
-  setFeedback("i", "ℹ️ Freitext, wird nicht automatisch bewertet.", true);
-  showExplanation("i", exp);
-}
-
-// ================ Aufgabe 2 – Logik ================
+// ----- Teilaufgaben Aufgabe 2 -----
 
 function show2a() {
   renderGraphSet("graph2-main", [f2_f]);
@@ -899,14 +811,13 @@ function check2c() {
   else msg = "❌ m und n sind (noch) nicht korrekt.";
   setFeedback("2c", msg, ok);
 
-  // Graph f und g anzeigen
   renderGraphSet("graph2-main", [f2_f, g2_f]);
 
   const exp = `
     Gesucht ist g(x) mit:<br>
     • Punkt P(0 | 2) liegt auf dem Graphen → g(0) = 2 ⇒ n = 2.<br>
     • Nullstelle x₀ = 3 ⇒ g(3) = 0.<br><br>
-    Steigung m berechnen aus den Punkten (0|2) und (3|0):<br>
+    Steigung m aus den Punkten (0|2) und (3|0):<br>
     m = (0 - 2) / (3 - 0) = -2/3.<br><br>
     Also: <code>g(x) = (-2/3)x + 2</code>.
   `;
@@ -935,7 +846,7 @@ function check2d() {
     (3/2)x + 3 = (-2/3)x + 2<br>
     ⇒ (3/2 + 2/3)x = -1<br>
     ⇒ (13/6)x = -1<br>
-    ⇒ x = -1 · (6/13) = -6/13<br>
+    ⇒ x = -6/13<br>
     Einsetzen in f oder g:<br>
     f(-6/13) = (3/2)·(-6/13) + 3 = -9/13 + 39/13 = 30/13.<br><br>
     Also S(-6/13 | 30/13).
@@ -955,15 +866,47 @@ function check2e() {
   );
 
   const exp = `
-    Die Eckpunkte des Dreiecks sind:<br>
+    Eckpunkte des Dreiecks:<br>
     • A = Nullstelle von f: (-2 | 0)<br>
     • B = Nullstelle von g: (3 | 0)<br>
     • C = Schnittpunkt S(-6/13 | 30/13)<br><br>
-    Die Grundseite liegt auf der x-Achse von x = -2 bis x = 3 → Länge = 5.<br>
-    Die Höhe ist der y-Wert des Schnittpunkts: h = 30/13.<br><br>
-    Flächeninhalt: A = (1/2) · Grundseite · Höhe = (1/2) · 5 · 30/13 = 75/13.
+    Grundseite auf der x-Achse: Länge 5 (von -2 bis 3).<br>
+    Höhe: y-Wert des Schnittpunkts: h = 30/13.<br><br>
+    Flächeninhalt: A = (1/2) · 5 · 30/13 = 75/13.
   `;
   showExplanation("2e", exp);
+}
+
+// ================ Lösungsknöpfe global verbinden ================
+
+function attachAllSolutionHandlers() {
+  const { f1, f2, f3, f4, f5, t1, t2 } = aufgabe1Data;
+
+  const handlers = {
+    a1: () => checkA("a1", f1, t1),
+    a2: () => checkA("a2", f2, t2),
+    b: () => explainB(f1, f2),
+    c: () => checkC(f2),
+    d: () => explainD(f3, f4, f5),
+    e: () => checkE(f4, f5),
+    f: () => explainF(f1, f4),
+    g: () => checkG(f4),
+    h: () => checkH(f5),
+    i: () => explainI(f1),
+    "2a": () => show2a(),
+    "2b": () => check2b(),
+    "2c": () => check2c(),
+    "2d": () => check2d(),
+    "2e": () => check2e(),
+  };
+
+  Object.entries(handlers).forEach(([id, fn]) => {
+    const btn = document.querySelector(`[data-solution-btn="${id}"]`);
+    if (btn && !btn.dataset.bound) {
+      btn.addEventListener("click", fn);
+      btn.dataset.bound = "true";
+    }
+  });
 }
 
 // ================ Tabs ================
@@ -989,5 +932,7 @@ window.addEventListener("DOMContentLoaded", () => {
   generateFunktionen();
   buildAufgabe1();
   buildAufgabe2();
+  attachAllSolutionHandlers();
 });
+
 
