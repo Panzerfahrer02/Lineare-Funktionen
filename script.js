@@ -51,7 +51,7 @@ function wertetabelle(f) {
   return xs.map((x) => ({ x, y: f.m * x + f.n }));
 }
 
-// ================ SVG-Koordinatensystem (für beide Aufgaben) ================
+// ================ SVG-Koordinatensystem (für alle Aufgaben) ================
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -109,7 +109,7 @@ function renderGraphSet(svgId, funcs) {
   ay.setAttribute("stroke-width", "0.08");
   svg.appendChild(ay);
 
-  // Farben für die Funktionsgraphen
+  // Farben für Graphen
   const colors = ["#22c55e", "#2563eb", "#f97316", "#ec4899", "#8b5cf6"];
 
   funcs.forEach((f, idx) => {
@@ -657,7 +657,6 @@ const f2_f = { m: 3 / 2, n: 3 };
 const g2_f = { m: -2 / 3, n: 2 };
 
 const f2_zero = -2;
-const g2_zero = 3;
 const inter2_x = -6 / 13;
 const inter2_y = 30 / 13;
 const tri2_area = 75 / 13;
@@ -877,12 +876,384 @@ function check2e() {
   showExplanation("2e", exp);
 }
 
+// ================ Aufgabe 3 – Arbeitsblatt mit y = 1,5x usw. ================
+
+let aufgabe3Data = {};
+
+function buildAufgabe3() {
+  const container = document.getElementById("aufgabe3-container");
+  if (!container) return;
+
+  // 1. Teil: y = 1.5x, 1.5x+1, 1.5x-2
+  const f31 = { m: 1.5, n: 0 };
+  const f32 = { m: 1.5, n: 1 };
+  const f33 = { m: 1.5, n: -2 };
+  const t31 = wertetabelle(f31);
+  const t32 = wertetabelle(f32);
+  const t33 = wertetabelle(f33);
+
+  // 2. Teil: andere lineare Funktionen
+  const g1 = { m: 3, n: -1 };
+  const g2 = { m: -4, n: 0 };
+  const g3 = { m: -0.5, n: 3 };   // -1/2 x + 3
+  const g4 = { m: -0.75, n: 3 };  // -3/4 x + 3
+  const g5 = { m: 1, n: -3 };
+
+  aufgabe3Data = { f31, f32, f33, t31, t32, t33, g1, g2, g3, g4, g5 };
+
+  container.innerHTML = `
+    <!-- 3a -->
+    <div class="card" id="task-3a">
+      <div class="subtask-title">1. a) Wertetabellen – Funktionen mit gleicher Steigung</div>
+      <div class="subtask-body">
+        <p>Ergänze die Wertetabellen für die folgenden Funktionen. Verwende die x-Werte -2, -1, 0, 1, 2.</p>
+
+        <p><strong>(1)</strong> <code>y = 1,5x</code></p>
+        <table class="value-table">
+          <tr>
+            <th>x</th>
+            ${t31.map((p) => `<th>${p.x}</th>`).join("")}
+          </tr>
+          <tr>
+            <th>y</th>
+            ${t31
+              .map(
+                (p, idx) =>
+                  `<td><input type="text" data-task="3a" data-f="1" data-index="${idx}"></td>`
+              )
+              .join("")}
+          </tr>
+        </table>
+
+        <p><strong>(2)</strong> <code>y = 1,5x + 1</code></p>
+        <table class="value-table">
+          <tr>
+            <th>x</th>
+            ${t32.map((p) => `<th>${p.x}</th>`).join("")}
+          </tr>
+          <tr>
+            <th>y</th>
+            ${t32
+              .map(
+                (p, idx) =>
+                  `<td><input type="text" data-task="3a" data-f="2" data-index="${idx}"></td>`
+              )
+              .join("")}
+          </tr>
+        </table>
+
+        <p><strong>(3)</strong> <code>y = 1,5x - 2</code></p>
+        <table class="value-table">
+          <tr>
+            <th>x</th>
+            ${t33.map((p) => `<th>${p.x}</th>`).join("")}
+          </tr>
+          <tr>
+            <th>y</th>
+            ${t33
+              .map(
+                (p, idx) =>
+                  `<td><input type="text" data-task="3a" data-f="3" data-index="${idx}"></td>`
+              )
+              .join("")}
+          </tr>
+        </table>
+
+        <button class="btn-solution" data-solution-btn="3a">Lösung anzeigen</button>
+        <div class="feedback" id="fb-3a"></div>
+        <div class="explanation" id="exp-3a" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- 3b -->
+    <div class="card" id="task-3b">
+      <div class="subtask-title">1. b) Verschiebung und Parallelen</div>
+      <div class="subtask-body">
+        <p>Betrachte die Graphen der Funktionen aus 1a) (am besten auf Papier oder im Kopf) und ergänze den Text.</p>
+        <p>Du kannst deine Vermutung hier eintragen – sie wird nicht automatisch bewertet. Beim Lösungsknopf kommt eine Erklärung.</p>
+
+        <p>
+          Den Graphen der Funktion <code>y = 1{,}5x + 1</code> erhält man, indem der Graph von
+          <code>y = 1{,}5x</code> um
+          <input type="text" data-task="3b" data-role="shift1" size="3">
+          Einheiten in
+          <input type="text" data-task="3b" data-role="dir1" size="6">
+          Richtung verschoben wird.
+          Er schneidet die y-Achse im Punkt (0 |
+          <input type="text" data-task="3b" data-role="y1" size="3">
+          ).
+        </p>
+
+        <p>
+          Den Graphen der Funktion <code>y = 1{,}5x - 2</code> erhält man, indem eine Parallele
+          zum Graphen von <code>y = 1{,}5x</code> durch den Punkt (0 |
+          <input type="text" data-task="3b" data-role="y2" size="3">
+          ) gezeichnet wird.
+        </p>
+
+        <button class="btn-solution" data-solution-btn="3b">Lösung anzeigen</button>
+        <div class="feedback" id="fb-3b"></div>
+        <div class="explanation" id="exp-3b" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- 3c -->
+    <div class="card" id="task-3c">
+      <div class="subtask-title">2. a) Anstieg m und y-Achsenabschnitt n</div>
+      <div class="subtask-body">
+        <p>Gib jeweils den Anstieg <code>m</code> und den y-Achsenabschnitt <code>n</code> an. Nach dem Lösungsknopf siehst du alle Graphen im selben Koordinatensystem.</p>
+
+        <div class="subtask-inputs">
+          <p>(1) <code>y = 3x - 1</code></p>
+          <label>m = </label><input type="text" data-task="3c" data-role="m1" size="4">
+          <label> n = </label><input type="text" data-task="3c" data-role="n1" size="4">
+        </div>
+
+        <div class="subtask-inputs">
+          <p>(2) <code>y = -4x</code></p>
+          <label>m = </label><input type="text" data-task="3c" data-role="m2" size="4">
+          <label> n = </label><input type="text" data-task="3c" data-role="n2" size="4">
+        </div>
+
+        <div class="subtask-inputs">
+          <p>(3) <code>y = -1/2 · x + 3</code></p>
+          <label>m = </label><input type="text" data-task="3c" data-role="m3" size="4">
+          <label> n = </label><input type="text" data-task="3c" data-role="n3" size="4">
+        </div>
+
+        <div class="subtask-inputs">
+          <p>(4) <code>y = -3/4 · x + 3</code></p>
+          <label>m = </label><input type="text" data-task="3c" data-role="m4" size="4">
+          <label> n = </label><input type="text" data-task="3c" data-role="n4" size="4">
+        </div>
+
+        <div class="subtask-inputs">
+          <p>(5) <code>y = x - 3</code></p>
+          <label>m = </label><input type="text" data-task="3c" data-role="m5" size="4">
+          <label> n = </label><input type="text" data-task="3c" data-role="n5" size="4">
+        </div>
+
+        <div class="coord-graph">
+          <svg id="graph-3c"></svg>
+        </div>
+
+        <button class="btn-solution" data-solution-btn="3c">Lösung anzeigen</button>
+        <div class="feedback" id="fb-3c"></div>
+        <div class="explanation" id="exp-3c" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- 3d -->
+    <div class="card" id="task-3d">
+      <div class="subtask-title">2. b) Achsenschnittpunkte von Graph (4)</div>
+      <div class="subtask-body">
+        <p>
+          Der Graph (4) hat die Funktionsgleichung <code>y = -3/4 · x + 3</code>.<br>
+          Bestimme die Schnittpunkte mit der x-Achse und der y-Achse.
+        </p>
+        <div class="subtask-inputs">
+          <p>x-Achse:</p>
+          <span>(</span>
+          <input type="text" data-task="3d" data-role="x0" size="4">
+          <span>| 0 )</span>
+        </div>
+        <div class="subtask-inputs">
+          <p>y-Achse:</p>
+          <span>( 0 | </span>
+          <input type="text" data-task="3d" data-role="y0" size="4">
+          <span>)</span>
+        </div>
+
+        <button class="btn-solution" data-solution-btn="3d">Lösung anzeigen</button>
+        <div class="feedback" id="fb-3d"></div>
+        <div class="explanation" id="exp-3d" style="display:none;"></div>
+      </div>
+    </div>
+  `;
+}
+
+// ----- Teilaufgaben Aufgabe 3 -----
+
+function check3a() {
+  const { f31, f32, f33, t31, t32, t33 } = aufgabe3Data;
+  const funcs = [
+    { f: f31, table: t31, id: 1 },
+    { f: f32, table: t32, id: 2 },
+    { f: f33, table: t33, id: 3 },
+  ];
+
+  let allOk = true;
+  const details = [];
+
+  funcs.forEach(({ f, table, id }) => {
+    let ok = true;
+    table.forEach((p, idx) => {
+      const inp = document.querySelector(
+        `input[data-task="3a"][data-f="${id}"][data-index="${idx}"]`
+      );
+      const val = parseNumberToken(inp.value || "");
+      if (val === null || Math.abs(val - p.y) > 1e-6) ok = false;
+    });
+    allOk = allOk && ok;
+    details.push(
+      `Funktion (${id}): ${ok ? "Tabelle korrekt." : "In der Tabelle sind noch Fehler."}`
+    );
+  });
+
+  setFeedback(
+    "3a",
+    (allOk ? "✅  " : "❌  ") + details.join(" "),
+    allOk
+  );
+
+  const explainRows = (f, table, name) =>
+    table
+      .map(
+        (p) =>
+          `${name}: x = ${p.x} → y = 1,5 · (${p.x}) ${
+            f.n >= 0 ? "+ " + f.n : "- " + Math.abs(f.n)
+          } = ${p.y}`
+      )
+      .join("<br>");
+
+  const exp = `
+    <strong>Alle drei Funktionen haben die Steigung m = 1,5.</strong><br>
+    Die verschiedenen Tabellen entstehen nur durch unterschiedliche y-Achsenabschnitte n.<br><br>
+    ${explainRows(f31, t31, "(1) y = 1,5x")}<br><br>
+    ${explainRows(f32, t32, "(2) y = 1,5x + 1")}<br><br>
+    ${explainRows(f33, t33, "(3) y = 1,5x - 2")}
+  `;
+  showExplanation("3a", exp);
+}
+
+function explain3b() {
+  setFeedback(
+    "3b",
+    "ℹ️ Deine Einträge werden nicht automatisch bewertet. Unten siehst du die vollständige Erklärung.",
+    true
+  );
+
+  const exp = `
+    <strong>Erste Aussage:</strong><br>
+    Beim Übergang von <code>y = 1{,}5x</code> zu <code>y = 1{,}5x + 1</code> wird die gesamte Gerade
+    um 1 Einheit nach <strong>oben</strong> verschoben. Die Steigung bleibt gleich (m = 1,5), nur der
+    y-Achsenabschnitt ändert sich von 0 auf 1. Deshalb schneidet der Graph die y-Achse im Punkt (0 | 1).<br><br>
+    <strong>Zweite Aussage:</strong><br>
+    Der Graph von <code>y = 1{,}5x - 2</code> ist zu <code>y = 1{,}5x</code> parallel (gleiche Steigung),
+    verläuft aber durch den Punkt (0 | -2). Man erhält ihn also, indem man eine Parallele zum Graphen
+    von <code>y = 1{,}5x</code> durch (0 | -2) zeichnet.
+  `;
+  showExplanation("3b", exp);
+}
+
+function check3c() {
+  const { g1, g2, g3, g4, g5 } = aufgabe3Data;
+
+  const funcs = [
+    { f: g1, mRole: "m1", nRole: "n1", label: "(1)" },
+    { f: g2, mRole: "m2", nRole: "n2", label: "(2)" },
+    { f: g3, mRole: "m3", nRole: "n3", label: "(3)" },
+    { f: g4, mRole: "m4", nRole: "n4", label: "(4)" },
+    { f: g5, mRole: "m5", nRole: "n5", label: "(5)" },
+  ];
+
+  let allOk = true;
+  const msgs = [];
+
+  funcs.forEach(({ f, mRole, nRole, label }) => {
+    const mInp = document.querySelector(
+      `input[data-task="3c"][data-role="${mRole}"]`
+    );
+    const nInp = document.querySelector(
+      `input[data-task="3c"][data-role="${nRole}"]`
+    );
+
+    const mVal = parseNumberToken(mInp.value || "");
+    const nVal = parseNumberToken(nInp.value || "");
+
+    const mOk = mVal !== null && Math.abs(mVal - f.m) < 1e-6;
+    const nOk = nVal !== null && Math.abs(nVal - f.n) < 1e-6;
+
+    const ok = mOk && nOk;
+    allOk = allOk && ok;
+
+    let text;
+    if (ok) text = `${label} m und n korrekt.`;
+    else if (mOk || nOk) text = `${label} ein Wert stimmt, der andere nicht.`;
+    else text = `${label} m und n sind (noch) falsch.`;
+    msgs.push(text);
+  });
+
+  setFeedback(
+    "3c",
+    (allOk ? "✅ " : "❌ ") + msgs.join(" "),
+    allOk
+  );
+
+  renderGraphSet("graph-3c", [g1, g2, g3, g4, g5]);
+
+  const exp = `
+    <strong>Merke:</strong> In der Schreibweise <code>y = mx + n</code> ist<br>
+    • <code>m</code> immer die Steigung (wie stark geht der Graph pro Schritt nach rechts nach oben/unten),<br>
+    • <code>n</code> ist der y-Achsenabschnitt (Schnittpunkt mit der y-Achse).<br><br>
+    Für unsere Funktionen gilt zum Beispiel:<br>
+    (1) <code>y = 3x - 1</code> → m = 3, n = -1<br>
+    (2) <code>y = -4x</code> → m = -4, n = 0<br>
+    (3) <code>y = -1/2 x + 3</code> → m = -1/2, n = 3<br>
+    (4) <code>y = -3/4 x + 3</code> → m = -3/4, n = 3<br>
+    (5) <code>y = x - 3</code> → m = 1, n = -3<br><br>
+    Im Koordinatensystem siehst du, dass sich vor allem die Steigung und der y-Achsenabschnitt auf
+    die Lage der Geraden auswirken.
+  `;
+  showExplanation("3c", exp);
+}
+
+function check3d() {
+  const { g4 } = aufgabe3Data;
+
+  const x0Input = document.querySelector(
+    'input[data-task="3d"][data-role="x0"]'
+  );
+  const y0Input = document.querySelector(
+    'input[data-task="3d"][data-role="y0"]'
+  );
+
+  const x0Val = parseNumberToken(x0Input.value || "");
+  const y0Val = parseNumberToken(y0Input.value || "");
+
+  const x0Corr = -g4.n / g4.m; // -3 / (-3/4) = 4
+  const y0Corr = g4.n;         // 3
+
+  const okX = x0Val !== null && Math.abs(x0Val - x0Corr) < 1e-6;
+  const okY = y0Val !== null && Math.abs(y0Val - y0Corr) < 1e-6;
+  const ok = okX && okY;
+
+  let msg;
+  if (okX && okY) msg = "✅ Beide Schnittpunkte sind korrekt.";
+  else if (okX || okY)
+    msg = "⚠️ Eine Koordinate stimmt, die andere nicht.";
+  else msg = "❌ Beide Koordinaten sind noch nicht korrekt.";
+  setFeedback("3d", msg, ok);
+
+  const exp = `
+    Funktion (4): <code>y = -3/4 x + 3</code><br><br>
+    <strong>x-Achse:</strong> Hier ist y = 0.<br>
+    0 = -3/4 x + 3 ⇒ -3/4 x = -3 ⇒ x = (-3) / (-3/4) = 4.<br>
+    Punkt: (4 | 0).<br><br>
+    <strong>y-Achse:</strong> Hier ist x = 0.<br>
+    y = -3/4 · 0 + 3 = 3.<br>
+    Punkt: (0 | 3).
+  `;
+  showExplanation("3d", exp);
+}
+
 // ================ Lösungsknöpfe global verbinden ================
 
 function attachAllSolutionHandlers() {
   const { f1, f2, f3, f4, f5, t1, t2 } = aufgabe1Data;
 
   const handlers = {
+    // Aufgabe 1
     a1: () => checkA("a1", f1, t1),
     a2: () => checkA("a2", f2, t2),
     b: () => explainB(f1, f2),
@@ -893,11 +1264,19 @@ function attachAllSolutionHandlers() {
     g: () => checkG(f4),
     h: () => checkH(f5),
     i: () => explainI(f1),
+
+    // Aufgabe 2
     "2a": () => show2a(),
     "2b": () => check2b(),
     "2c": () => check2c(),
     "2d": () => check2d(),
     "2e": () => check2e(),
+
+    // Aufgabe 3
+    "3a": () => check3a(),
+    "3b": () => explain3b(),
+    "3c": () => check3c(),
+    "3d": () => check3d(),
   };
 
   Object.entries(handlers).forEach(([id, fn]) => {
@@ -932,6 +1311,7 @@ window.addEventListener("DOMContentLoaded", () => {
   generateFunktionen();
   buildAufgabe1();
   buildAufgabe2();
+  buildAufgabe3();
   attachAllSolutionHandlers();
 });
 
