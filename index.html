@@ -2,54 +2,89 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Wiederholung lineare Funktionen – Trainer</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Mathe-Trainer – Aufgabenübersicht</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #e0f2fe, #f5f5f7);
+      color: #111827;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .app {
+      background: #ffffff;
+      padding: 2rem 2.5rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      margin-top: 0;
+      margin-bottom: 0.4rem;
+      font-size: 1.9rem;
+    }
+    p {
+      margin-top: 0;
+      margin-bottom: 1.2rem;
+      color: #6b7280;
+    }
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+    .task-link {
+      display: block;
+      padding: 0.6rem 0.9rem;
+      border-radius: 0.7rem;
+      border: 1px solid #e5e7eb;
+      text-decoration: none;
+      color: #111827;
+      background: #f9fafb;
+      transition: all 0.15s ease;
+    }
+    .task-link span {
+      display: block;
+      font-size: 0.88rem;
+      color: #6b7280;
+      margin-top: 0.1rem;
+    }
+    .task-link:hover {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #1d4ed8;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+    }
+    .task-link:hover span {
+      color: #e5e7eb;
+    }
+  </style>
 </head>
 <body>
   <div class="app">
-    <h1>Wiederholung lineare Funktionen 📘</h1>
-    <p class="subtitle">
-      Bearbeite Schritt für Schritt die Aufgaben und lass dir zu jeder Teilaufgabe eine Erklärung anzeigen.
-    </p>
+    <h1>Mathe-Trainer 📘</h1>
+    <p>Wähle aus, zu welcher Aufgabe du möchtest.</p>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-button active" data-tab="1">Aufgabe 1</button>
-      <button class="tab-button" data-tab="2">Aufgabe 2</button>
-      <button class="tab-button" data-tab="3">Aufgabe 3</button>
-    </div>
-
-    <!-- Inhalt Aufgabe 1 -->
-    <div id="tab-1" class="tab-content active">
-      <h2>Aufgabe 1 – Lineare Funktionen</h2>
-      <p class="tab-hint">
-        Die Funktionen (1) bis (5) werden zufällig gewählt, bleiben aber innerhalb dieser Seite gleich.
-        Bearbeite die Teilaufgaben der Reihe nach. Klicke bei jeder Teilaufgabe auf
-        <strong>„Lösung anzeigen“</strong>, um die Erklärung zu sehen.
-      </p>
-      <div id="aufgabe1-funktionsliste" class="card small-card"></div>
-      <div id="aufgabe1-container"></div>
-    </div>
-
-    <!-- Inhalt Aufgabe 2 -->
-    <div id="tab-2" class="tab-content">
-      <h2>Aufgabe 2</h2>
-      <p class="tab-hint">
-        Hier können wir später weitere Aufgaben ergänzen.
-      </p>
-      <div id="aufgabe2-container"></div>
-    </div>
-
-    <!-- Inhalt Aufgabe 3 -->
-    <div id="tab-3" class="tab-content">
-      <h2>Aufgabe 3</h2>
-      <p class="tab-hint">
-        Hier können wir später weitere Aufgaben ergänzen.
-      </p>
-      <div id="aufgabe3-container"></div>
+    <div class="task-list">
+      <a class="task-link" href="aufgabe1/">
+        Aufgabe 1 – Wiederholung lineare Funktionen
+        <span>Wertetabellen, Steigung, Achsenschnittpunkte, Nullstellen …</span>
+      </a>
+      <a class="task-link" href="aufgabe2/">
+        Aufgabe 2 – (noch frei)
+        <span>Wird später mit weiteren Aufgaben gefüllt.</span>
+      </a>
+      <a class="task-link" href="aufgabe3/">
+        Aufgabe 3 – (noch frei)
+        <span>Ebenfalls Platz für eine eigene Aufgabenserie.</span>
+      </a>
     </div>
   </div>
-
-  <script src="script.js"></script>
 </body>
 </html>
